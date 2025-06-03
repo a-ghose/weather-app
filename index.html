@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Weather App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding-top: 50px;
+    }
+    input {
+      padding: 10px;
+      width: 250px;
+      font-size: 16px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin-left: 10px;
+    }
+    .weather-result {
+      margin-top: 30px;
+      font-size: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Weather App</h1>
+  <input type="text" id="cityInput" placeholder="Enter City" />
+  <button onclick="getWeather()">Get Weather</button>
+
+  <div class="weather-result" id="result"></div>
+
+  <script>
+
+    async function getWeather() {
+      const city = document.getElementById("cityInput").value;
+      if (!city) return;
+
+      const url = `/weather?city=${encodeURIComponent(city)}`;
+
+
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+
+        const resultDiv = document.getElementById("result");
+
+        if (data.cod === "404") {
+          resultDiv.textContent = "Invalid city name. Please try again.";
+        } else {
+          const weather = data.weather[0].main;
+          const temperature = Math.round(data.main.temp);
+          resultDiv.innerHTML = `
+            The weather in <strong>${city}</strong> is: ${weather} <br />
+            The temperature is: ${temperature} °F
+          `;
+        }
+      } catch (err) {
+        document.getElementById("result").textContent = "Error fetching weather data.";
+        console.error(err);
+      }
+    }
+
+    // Allow pressing Enter to trigger the search
+    document.getElementById("cityInput").addEventListener("keydown", function(event) {
+      if (event.key === "Enter") {
+        getWeather();
+      }
+    });
+  </script>
+
+</body>
+</html>
